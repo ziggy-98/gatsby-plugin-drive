@@ -26,6 +26,7 @@ const getToken = ({ keyFile, key }) => {
 };
 
 const getFolder = (folderId, token) => {
+  // console.log('hello');
   return new Promise((resolve, reject) => {
     request(
       {
@@ -35,10 +36,12 @@ const getFolder = (folderId, token) => {
         },
         qs: {
           q: `'${folderId}' in parents`,
+          fields: `files(id, kind, name, parents, webViewLink, mimeType)`
         },
       },
       (err, res, body) => {
         if (err) {
+          console.log(err);
           reject(err);
         } else {
           resolve(JSON.parse(body).files);
@@ -49,6 +52,7 @@ const getFolder = (folderId, token) => {
 };
 
 const getFile = (fileId, token) => {
+  // console.log('hello2');
   return new Promise((resolve, reject) => {
     requestFile(resolve, reject, fileId, token, 1100);
   });
@@ -89,15 +93,15 @@ function requestFile(resolve, reject, fileId, token, delay) {
     auth: {
       bearer: token,
     },
-    encoding: null,
     qs: {
-      alt: 'media',
+      fields: `id, kind, name, parents, webViewLink, mimeType`
     },
   },
   (err, res, body) => {
     if (err) {
       reject(err);
     } else if (res.statusCode == 403) {
+      console.log('hello3');
       setTimeout(() => {
         requestFile(resolve, reject, fileId, token, delay * 2);
       }, delay * 2);
